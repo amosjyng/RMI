@@ -10,9 +10,11 @@ public class RemoteServer implements Remote
     public static void main(String[] args) throws Exception
     {
         //System.setSecurityManager(new SecurityManager());
-        //Registry registry = LocateRegistry.createRegistry(1099);
-        Registry registry = LocateRegistry.getRegistry("127.0.0.1");
+        Registry registry = LocateRegistry.createRegistry(1099);
+        //Registry registry = LocateRegistry.getRegistry("127.0.0.1");
         registry.rebind("zip code server",
                 (ZipCodeServer) UnicastRemoteObject.exportObject(new ZipCodeServerImpl(), 0));
+        System.out.println("Server running and added to registry");
+        while (true);
     }
 }
