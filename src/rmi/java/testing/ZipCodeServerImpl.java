@@ -7,8 +7,10 @@ public class ZipCodeServerImpl extends RemoteServer implements ZipCodeServer
     ZipCodeList l;
     
     // this is a constructor.
-    public ZipCodeServerImpl()
+    public ZipCodeServerImpl() throws RemoteException
     {
+        super();
+        
         l = null;
     }
     
@@ -25,14 +27,14 @@ public class ZipCodeServerImpl extends RemoteServer implements ZipCodeServer
     {
         // search the list.
         ZipCodeList temp = l;
-        while (temp != null && !temp.city.equals(request))
-            temp = temp.next;
+        while (temp != null && !temp.getCity().equals(request))
+            temp = temp.getNext();
         
         // the result is either null or we found the match.
         if (temp == null)
             return null;
         else
-            return temp.ZipCode;
+            return temp.getZipCode();
     }
     
     // this very short method should send the marshalled
@@ -48,8 +50,8 @@ public class ZipCodeServerImpl extends RemoteServer implements ZipCodeServer
         ZipCodeList temp = l;
         while (temp != null)
         {
-            System.out.println("city: " + temp.city + ", " + "code: " + temp.ZipCode + "\n");
-            temp = temp.next;
+            System.out.println("city: " + temp.getCity() + ", " + "code: " + temp.getZipCode() + "\n");
+            temp = temp.getNext();
         }
     }
 }
