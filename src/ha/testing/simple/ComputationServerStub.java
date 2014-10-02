@@ -2,9 +2,6 @@ package ha.testing.simple;
 
 import ha.rmi.RemoteException;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
-
 public class ComputationServerStub implements ComputationServer
 {
     /**

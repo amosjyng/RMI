@@ -153,6 +153,7 @@ public class Registry
      */
     public void listenForMethodInvocations() throws IOException
     {
+        @SuppressWarnings("resource")
         ServerSocket ss = new ServerSocket(clientPort);
         while (true)
         {
