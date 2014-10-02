@@ -1,5 +1,7 @@
 package ha.testing.simple;
 
+import ha.rmi.RemoteException;
+
 import java.io.IOException;
 
 public class ComputationServerImpl implements ComputationServer
@@ -10,6 +12,12 @@ public class ComputationServerImpl implements ComputationServer
     public String getSomething()
     {
         return "Booyah!" + id;
+    }
+    
+    @Override
+    public String sayHiTo(String name) throws RemoteException
+    {
+        return "Hi, " + name  + "!";
     }
     
     public static void main(String[] args) throws IOException, NumberFormatException

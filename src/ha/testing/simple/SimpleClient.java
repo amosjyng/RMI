@@ -22,6 +22,7 @@ public class SimpleClient
             try
             {
                 System.out.println(ss.getSomething());
+                System.out.println(ss.sayHiTo("Fucker"));
             }
             catch (RemoteException e)
             {
