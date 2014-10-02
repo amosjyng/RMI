@@ -164,7 +164,6 @@ public class Registry
                 ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
                 Message invocationRequest = (Message) ois.readObject();
                 ois.close();
-                ss.close();
                 System.out.println("Invocation request for local object \"" + invocationRequest.getObjectString() + "\""
                                    + " for the method \"" + invocationRequest.getMethod() + "\"");
                 

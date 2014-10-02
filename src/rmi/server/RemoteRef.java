@@ -5,6 +5,8 @@ import java.io.ObjectOutput;
 
 
 
+import java.lang.reflect.Method;
+
 import rmi.Remote;
 public interface RemoteRef extends Externalizable{
   static long serialVersionUID=3632638527362204081L;

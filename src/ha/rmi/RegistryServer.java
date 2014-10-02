@@ -118,7 +118,6 @@ public class RegistryServer
                 returnStream.close();
                 returnSocket.close();
                 resultsStream.close();
-                resultsSocket.close();
             }
             else
             {
@@ -126,7 +125,6 @@ public class RegistryServer
             }
             
             ois.close();
-            acceptedSocket.close();
         }
         catch (IOException e)
         {
