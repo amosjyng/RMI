@@ -4,18 +4,20 @@ import java.io.IOException;
 
 public class ComputationServerImpl implements ComputationServer
 {
+    private static String id;
+    
     @Override
     public String getSomething()
     {
-        return "Booyah!";
+        return "Booyah!" + id;
     }
     
     public static void main(String[] args) throws IOException, NumberFormatException
     {
-        if (args.length != 5)
+        if (args.length != 6)
         {
             System.out.println("USAGE: java ha.testing.simple.SimpleServerImpl <server address> <server command port> "
-                               + "<server results port> <client address> <client port>");
+                               + "<server results port> <client address> <client port> <ID number>");
         }
         else
         {
@@ -24,7 +26,8 @@ public class ComputationServerImpl implements ComputationServer
                                             args[3], Integer.parseInt(args[4]));
             
             ComputationServer ss = new ComputationServerImpl();
-            registry.bind("simple server", ss);
+            id = args[5];
+            registry.bind("simple server " + id, ss);
             registry.listenForMethodInvocations();
         }
     }

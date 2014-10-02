@@ -8,16 +8,16 @@ public class SimpleClient
 {
     public static void main(String[] args) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException
     {
-        if (args.length != 4)
+        if (args.length != 5)
         {
             System.out.println("USAGE: java ha.testing.simple.SimpleClient <server address> <server command port> "
-                               + "<client address> <client port>");
+                               + "<client address> <client port> <ID number>");
         }
         else
         {
             ha.rmi.Registry registry = ha.rmi.Registry.getRegistry(args[0], Integer.parseInt(args[1]), null,
                                                               args[2], Integer.parseInt(args[3]));
-            ComputationServer ss = (ComputationServer) registry.get("simple server", ComputationServerStub.class);
+            ComputationServer ss = (ComputationServer) registry.get("simple server " + args[4], ComputationServerStub.class);
             System.out.println("Asking local instance of simple server for something...");
             try
             {
