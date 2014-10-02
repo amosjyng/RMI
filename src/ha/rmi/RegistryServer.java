@@ -97,19 +97,25 @@ public class RegistryServer
             {
                 // first send the other machine the method invocation request
                 Message invocationRequest = (Message) ois.readObject();
+                if (!references.containsKey(invocationRequest.getObjectString()))
+                {
+                    throw new Exception("Object \"" + invocationRequest.getObjectString() + "\" not registered yet!");
+                }
                 Reference reference = references.get(invocationRequest.getObjectString());
+                System.out.println("Asking " + reference.getHost() + ":" + reference.getPort() + " to do computation...");
                 Socket objectHostSocket = new Socket(reference.getHost(), reference.getPort());
                 ObjectOutputStream oos = new ObjectOutputStream(objectHostSocket.getOutputStream());
-                
                 oos.writeObject(invocationRequest);
-                
                 oos.close();
                 objectHostSocket.close();
                 
                 // now wait for the other machine to return the results of the method invocation
                 // and pass those results on to the listening machine
+                System.out.println("Waiting for computation results...");
                 Socket rs = resultsSocket.accept();
                 ObjectInputStream resultsStream = new ObjectInputStream(rs.getInputStream());
+                System.out.println("Returning result to " + invocationRequest.getReturnAddress()
+                                   + ":" + invocationRequest.getReturnPort() + "...");
                 Socket returnSocket = new Socket(invocationRequest.getReturnAddress(), invocationRequest.getReturnPort());
                 ObjectOutputStream returnStream = new ObjectOutputStream(returnSocket.getOutputStream());
                 
@@ -135,6 +141,10 @@ public class RegistryServer
         {
             System.err.println("Error encountered while trying to read object from client!");
             e.printStackTrace();
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
         }
     }
     

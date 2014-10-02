@@ -3,12 +3,14 @@ package ha.rmi;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -114,7 +116,7 @@ public class Registry
         }
     }
     
-    public Object invoke(String objectString, String methodString) throws RemoteException
+    public Object invoke(String objectString, String methodString, List<Serializable> parameters) throws RemoteException
     {
         try
         {
@@ -122,7 +124,7 @@ public class Registry
             Socket s = new Socket(serverAddress, serverPort);
             ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
             oos.writeObject(RegistryServer.INVOKE);
-            oos.writeObject(new Message(objectString, methodString, clientAddress, clientPort));
+            oos.writeObject(new Message(objectString, methodString, parameters, clientAddress, clientPort));
             oos.close();
             s.close();
             
@@ -170,8 +172,8 @@ public class Registry
                 
                 // execute invocation
                 Object requestedObject = localObjects.get(invocationRequest.getObjectString());
-                Method requestedMethod = requestedObject.getClass().getMethod(invocationRequest.getMethod());
-                Object result = requestedMethod.invoke(requestedObject);
+                Method requestedMethod = requestedObject.getClass().getMethod(invocationRequest.getMethod(), invocationRequest.getParameterTypes());
+                Object result = requestedMethod.invoke(requestedObject, invocationRequest.getParameters());
                 
                 // return result to RMI server
                 Socket rs = new Socket(serverAddress, serverResultsPort);

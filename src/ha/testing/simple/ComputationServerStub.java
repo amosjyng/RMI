@@ -1,5 +1,8 @@
 package ha.testing.simple;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+
 import ha.rmi.RemoteException;
 
 public class ComputationServerStub implements ComputationServer
@@ -17,6 +20,6 @@ public class ComputationServerStub implements ComputationServer
     @Override
     public String getSomething() throws RemoteException
     {
-        return (String) ha.rmi.Registry.getClient().invoke(objectString, "getSomething");
+        return (String) ha.rmi.Registry.getClient().invoke(objectString, "getSomething", new ArrayList<Serializable>());
     }
 }
