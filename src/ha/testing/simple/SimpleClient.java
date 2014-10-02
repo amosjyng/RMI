@@ -15,9 +15,9 @@ public class SimpleClient
         }
         else
         {
-            ha.rmi.Client rmiClient = ha.rmi.Client.getClient(args[0], Integer.parseInt(args[1]), null,
+            ha.rmi.Registry registry = ha.rmi.Registry.getRegistry(args[0], Integer.parseInt(args[1]), null,
                                                               args[2], Integer.parseInt(args[3]));
-            SimpleServer ss = (SimpleServer) rmiClient.get("simple server", SimpleServerStub.class);
+            ComputationServer ss = (ComputationServer) registry.get("simple server", ComputationServerStub.class);
             System.out.println("Asking local instance of simple server for something...");
             try
             {

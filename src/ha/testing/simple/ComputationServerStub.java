@@ -5,14 +5,14 @@ import ha.rmi.RemoteException;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-public class SimpleServerStub implements SimpleServer
+public class ComputationServerStub implements ComputationServer
 {
     /**
      * The object string the actual object is bound to, on the RMI server
      */
     String objectString;
     
-    public SimpleServerStub(String objectString)
+    public ComputationServerStub(String objectString)
     {
         this.objectString = objectString;
     }
@@ -20,6 +20,6 @@ public class SimpleServerStub implements SimpleServer
     @Override
     public String getSomething() throws RemoteException
     {
-        return (String) ha.rmi.Client.getClient().invoke(objectString, "getSomething");
+        return (String) ha.rmi.Registry.getClient().invoke(objectString, "getSomething");
     }
 }

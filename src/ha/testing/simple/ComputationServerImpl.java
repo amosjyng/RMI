@@ -2,7 +2,7 @@ package ha.testing.simple;
 
 import java.io.IOException;
 
-public class SimpleServerImpl implements SimpleServer
+public class ComputationServerImpl implements ComputationServer
 {
     @Override
     public String getSomething()
@@ -19,13 +19,13 @@ public class SimpleServerImpl implements SimpleServer
         }
         else
         {
-            ha.rmi.Client rmiClient =
-                    ha.rmi.Client.getClient(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]),
+            ha.rmi.Registry registry =
+                    ha.rmi.Registry.getRegistry(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]),
                                             args[3], Integer.parseInt(args[4]));
             
-            SimpleServer ss = new SimpleServerImpl();
-            rmiClient.bind("simple server", ss);
-            rmiClient.listenForMethodInvocations();
+            ComputationServer ss = new ComputationServerImpl();
+            registry.bind("simple server", ss);
+            registry.listenForMethodInvocations();
         }
     }
 }

@@ -17,12 +17,12 @@ import java.util.Map;
  * Anything wishing to connect to the RMI server should extend this base class
  *
  */
-public class Client
+public class Registry
 {
     /**
      * The singleton instance of this client
      */
-    private static Client instance = null;
+    private static Registry instance = null;
     
     /**
      * Mapping of strings to objects contained on this particular machine
@@ -54,7 +54,7 @@ public class Client
      */
     private Integer clientPort;
     
-    protected Client(String serverAddress, Integer serverPort, Integer serverResultsPort, String clientAddress, Integer clientPort)
+    protected Registry(String serverAddress, Integer serverPort, Integer serverResultsPort, String clientAddress, Integer clientPort)
     {
         this.serverAddress = serverAddress;
         this.serverPort = serverPort;
@@ -63,17 +63,17 @@ public class Client
         this.clientPort = clientPort;
     }
     
-    public static Client getClient(String serverAddress, Integer serverPort, Integer serverResultsPort, String clientAddress, Integer clientPort)
+    public static Registry getRegistry(String serverAddress, Integer serverPort, Integer serverResultsPort, String clientAddress, Integer clientPort)
     {
         if (instance == null)
         {
-            instance = new Client(serverAddress, serverPort, serverResultsPort, clientAddress, clientPort);
+            instance = new Registry(serverAddress, serverPort, serverResultsPort, clientAddress, clientPort);
         }
         
         return instance;
     }
     
-    public static Client getClient()
+    public static Registry getClient()
     {
         return instance;
     }
@@ -94,9 +94,9 @@ public class Client
         // and bind remotely on RMI server as well
         Socket s = new Socket(serverAddress, serverPort);
         ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
-        oos.writeObject(Server.BIND);
+        oos.writeObject(RegistryServer.BIND);
         oos.writeObject(objectString);
-        oos.writeObject(new Server.Reference(clientAddress, clientPort));
+        oos.writeObject(new RegistryServer.Reference(clientAddress, clientPort));
         oos.close();
         s.close();
     }
@@ -121,7 +121,7 @@ public class Client
             // send invocation request to server
             Socket s = new Socket(serverAddress, serverPort);
             ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
-            oos.writeObject(Server.INVOKE);
+            oos.writeObject(RegistryServer.INVOKE);
             oos.writeObject(new Message(objectString, methodString, clientAddress, clientPort));
             oos.close();
             s.close();

@@ -13,7 +13,7 @@ import java.util.Map;
  * This is the RMI server that stores object references, not the server doing actual computations.
  *
  */
-public class Server
+public class RegistryServer
 {
     public static String BIND = "bind";
     public static String INVOKE = "invoke";
@@ -67,7 +67,7 @@ public class Server
         }
     }
     
-    public Server(int commandPort, int resultsPort) throws IOException
+    public RegistryServer(int commandPort, int resultsPort) throws IOException
     {
         commandSocket = new ServerSocket(commandPort);
         resultsSocket = new ServerSocket(resultsPort);
@@ -144,11 +144,11 @@ public class Server
     {
         if (args.length != 2)
         {
-            System.out.println("USAGE: java ha.rmi.Server <command port> <results port>");
+            System.out.println("USAGE: java ha.rmi.RegistryServer <command port> <results port>");
         }
         else
         {
-            Server server = new Server(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
+            RegistryServer server = new RegistryServer(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
             
             while (true)
             {
