@@ -3,7 +3,6 @@ package ha.testing.simple;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import ha.rmi.RemoteException;
 
