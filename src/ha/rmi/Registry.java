@@ -14,7 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This is the RMI client that connects to the RMI server to perform object bindings/method invocations
+ * This is the RMI client that connects to the RMI server to perform object bindings/method
+ * invocations
  * 
  * Anything wishing to connect to the RMI server should extend this base class
  *
@@ -56,7 +57,8 @@ public class Registry
      */
     private Integer clientPort;
     
-    protected Registry(String serverAddress, Integer serverPort, Integer serverResultsPort, String clientAddress, Integer clientPort)
+    protected Registry(String serverAddress, Integer serverPort, Integer serverResultsPort,
+            String clientAddress, Integer clientPort)
     {
         this.serverAddress = serverAddress;
         this.serverPort = serverPort;
@@ -65,11 +67,13 @@ public class Registry
         this.clientPort = clientPort;
     }
     
-    public static Registry getRegistry(String serverAddress, Integer serverPort, Integer serverResultsPort, String clientAddress, Integer clientPort)
+    public static Registry getRegistry(String serverAddress, Integer serverPort,
+            Integer serverResultsPort, String clientAddress, Integer clientPort)
     {
         if (instance == null)
         {
-            instance = new Registry(serverAddress, serverPort, serverResultsPort, clientAddress, clientPort);
+            instance = new Registry(serverAddress, serverPort, serverResultsPort, clientAddress,
+                    clientPort);
         }
         
         return instance;
@@ -82,10 +86,11 @@ public class Registry
     
     /**
      * Bind an object to a string both locally and on the RMI server.
+     * 
      * @param objectString
      * @param object
-     * @throws IOException 
-     * @throws UnknownHostException 
+     * @throws IOException
+     * @throws UnknownHostException
      */
     public void bind(String objectString, Object object) throws UnknownHostException, IOException
     {
@@ -104,7 +109,9 @@ public class Registry
     }
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public Object get(String objectString, Class stubClass) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException
+    public Object get(String objectString, Class stubClass) throws InstantiationException,
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException,
+            NoSuchMethodException, SecurityException
     {
         if (localObjects.containsKey(objectString))
         {
@@ -116,7 +123,8 @@ public class Registry
         }
     }
     
-    public Object invoke(String objectString, String methodString, List<Serializable> parameters) throws RemoteException
+    public Object invoke(String objectString, String methodString, List<Class> parameterTypes,
+            List<Serializable> parameters) throws RemoteException
     {
         try
         {
@@ -124,7 +132,8 @@ public class Registry
             Socket s = new Socket(serverAddress, serverPort);
             ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
             oos.writeObject(RegistryServer.INVOKE);
-            oos.writeObject(new Message(objectString, methodString, parameters, clientAddress, clientPort));
+            oos.writeObject(new Message(objectString, methodString, parameterTypes, parameters,
+                    clientAddress, clientPort));
             oos.close();
             s.close();
             
@@ -151,6 +160,7 @@ public class Registry
     
     /**
      * Keep listening for method invocations and execute them whenever they're received
+     * 
      * @throws IOException
      */
     public void listenForMethodInvocations() throws IOException
@@ -167,13 +177,16 @@ public class Registry
                 ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
                 Message invocationRequest = (Message) ois.readObject();
                 ois.close();
-                System.out.println("Invocation request for local object \"" + invocationRequest.getObjectString() + "\""
-                                   + " for the method \"" + invocationRequest.getMethod() + "\"");
+                System.out.println("Invocation request for local object \""
+                        + invocationRequest.getObjectString() + "\"" + " for the method \""
+                        + invocationRequest.getMethod() + "\"");
                 
                 // execute invocation
                 Object requestedObject = localObjects.get(invocationRequest.getObjectString());
-                Method requestedMethod = requestedObject.getClass().getMethod(invocationRequest.getMethod(), invocationRequest.getParameterTypes());
-                Object result = requestedMethod.invoke(requestedObject, invocationRequest.getParameters());
+                Method requestedMethod = requestedObject.getClass().getMethod(
+                        invocationRequest.getMethod(), invocationRequest.getParameterTypes());
+                Object result = requestedMethod.invoke(requestedObject,
+                        invocationRequest.getParameters());
                 
                 // return result to RMI server
                 Socket rs = new Socket(serverAddress, serverResultsPort);

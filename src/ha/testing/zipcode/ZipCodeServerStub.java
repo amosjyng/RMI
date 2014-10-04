@@ -12,29 +12,33 @@ public class ZipCodeServerStub implements ZipCodeServer
     {
         this.objectString = objectString;
     }
-
+    
     @Override
     public void initialise(ZipCodeList newlist) throws RemoteException
     {
-        ha.rmi.Registry.getClient().invoke(objectString, "initialise", Arrays.asList(newlist));
+        ha.rmi.Registry.getClient().invoke(objectString, "initialise",
+                Arrays.asList(ZipCodeList.class), Arrays.asList(newlist));
     }
-
+    
     @Override
     public String find(String city) throws RemoteException
     {
-        return (String) ha.rmi.Registry.getClient().invoke(objectString, "find", Arrays.asList(city));
+        return (String) ha.rmi.Registry.getClient().invoke(objectString, "find",
+                Arrays.asList(String.class), Arrays.asList(city));
     }
-
+    
     @Override
     public ZipCodeList findAll() throws RemoteException
     {
-        return (ZipCodeList) ha.rmi.Registry.getClient().invoke(objectString, "findAll", Arrays.asList());
+        return (ZipCodeList) ha.rmi.Registry.getClient().invoke(objectString, "findAll",
+                Arrays.asList(), Arrays.asList());
     }
-
+    
     @Override
     public void printAll() throws RemoteException
     {
-        ha.rmi.Registry.getClient().invoke(objectString, "printAll", Arrays.asList());
+        ha.rmi.Registry.getClient().invoke(objectString, "printAll", Arrays.asList(),
+                Arrays.asList());
     }
     
 }

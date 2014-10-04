@@ -17,16 +17,19 @@ public class ComputationServerStub implements ComputationServer
     {
         this.objectString = objectString;
     }
-
+    
     @Override
     public String getSomething() throws RemoteException
     {
-        return (String) ha.rmi.Registry.getClient().invoke(objectString, "getSomething", new ArrayList<Serializable>());
+        return (String) ha.rmi.Registry.getClient().invoke(objectString, "getSomething",
+                new ArrayList<Class>(), new ArrayList<Serializable>());
     }
-
+    
     @Override
     public String sayHiTo(String name) throws RemoteException
     {
-        return (String) ha.rmi.Registry.getClient().invoke(objectString, "sayHiTo", Arrays.asList(name));
+        return (String) ha.rmi.Registry.getClient().invoke(objectString, "sayHiTo",
+                Arrays.asList(String.class),
+                Arrays.asList(name));
     }
 }
