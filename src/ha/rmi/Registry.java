@@ -108,27 +108,20 @@ public class Registry extends Thread
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public Object get(String objectString, Class stubClass) throws RemoteException
     {
-        if (localObjects.containsKey(objectString))
+        try
         {
-            return localObjects.get(objectString);
+            return stubClass.getConstructor(String.class).newInstance(objectString);
         }
-        else
+        catch (InvocationTargetException e)
         {
-            try
-            {
-                return stubClass.getConstructor(String.class).newInstance(objectString);
-            }
-            catch (InvocationTargetException e)
-            {
-                e.getTargetException().printStackTrace();
-                throw new RemoteException(e.getTargetException().getMessage());
-            }
-            catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-                    | NoSuchMethodException | SecurityException e)
-            {
-                throw new RemoteException("Can't retrieve object \"" + objectString
-                        + "\" from RMI server!");
-            }
+            e.getTargetException().printStackTrace();
+            throw new RemoteException(e.getTargetException().getMessage());
+        }
+        catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+                | NoSuchMethodException | SecurityException e)
+        {
+            throw new RemoteException("Can't retrieve object \"" + objectString
+                    + "\" from RMI server!");
         }
     }
     

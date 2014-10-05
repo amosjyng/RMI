@@ -26,11 +26,12 @@ public class ComputationServerStub implements ComputationServer
                 new ArrayList<Class>(), new ArrayList<Serializable>());
     }
     
+    @SuppressWarnings("rawtypes")
     @Override
     public String sayHiTo(String name) throws RemoteException
     {
         return (String) ha.rmi.Registry.getClient().invoke(objectString, "sayHiTo",
-                Arrays.asList(String.class),
-                Arrays.asList(name));
+                Arrays.asList((Class) String.class),
+                Arrays.asList((Serializable) name));
     }
 }
