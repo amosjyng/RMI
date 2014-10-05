@@ -29,6 +29,7 @@ public class RMIClassLoader extends Object{
     
   }
   public static RMIClassLoaderSpi getDefaultProviderInstance(){
+    return null;
     
   }
 }

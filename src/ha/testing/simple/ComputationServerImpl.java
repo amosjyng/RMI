@@ -36,8 +36,6 @@ public class ComputationServerImpl implements ComputationServer
             ComputationServer ss = new ComputationServerImpl();
             id = args[4];
             registry.bind("simple server " + id, ss);
-            while (true)
-                ; // just chill
         }
     }
 }

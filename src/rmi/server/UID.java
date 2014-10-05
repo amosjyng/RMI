@@ -4,9 +4,8 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import sunw.io.Serializable;
 
-public final class UID extends Object implements Serializable{
+public final class UID extends Object implements java.io.Serializable{
   public UID(){
     
   }

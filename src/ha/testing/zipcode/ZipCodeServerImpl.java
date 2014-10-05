@@ -71,8 +71,6 @@ public class ZipCodeServerImpl implements ZipCodeServer
             
             ZipCodeServer zcs = new ZipCodeServerImpl();
             registry.bind("zipcode server", zcs);
-            while (true)
-                ; // just chill
         }
     }
 }
