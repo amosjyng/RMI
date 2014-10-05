@@ -97,8 +97,8 @@ public class Registry extends Thread
         Socket s = new Socket(serverAddress, serverPort);
         ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
         oos.writeObject(RegistryServer.BIND);
-        oos.writeObject(objectString);
-        oos.writeObject(new Reference(clientAddress, clientInvocationsPort));
+       
+        oos.writeObject(new Reference(objectString,clientAddress, clientInvocationsPort));
         oos.close();
         s.close();
     }
@@ -108,7 +108,8 @@ public class Registry extends Thread
     {
         try
         {
-            return stubClass.getConstructor(String.class).newInstance(objectString);
+            
+            return stubClass.getConstructor(Reference.class).newInstance(getReference(objectString));
         }
         catch (InvocationTargetException e)
         {
@@ -118,41 +119,56 @@ public class Registry extends Thread
         catch (InstantiationException | IllegalAccessException | IllegalArgumentException
                 | NoSuchMethodException | SecurityException e)
         {
+            e.printStackTrace();
             throw new RemoteException("Can't retrieve object \"" + objectString
                     + "\" from RMI server!");
         }
     }
     
+    public Reference getReference(String objectString) throws RemoteException{
+      try
+      {
+          Socket referenceSocket = new Socket(serverAddress, serverPort);
+          ObjectOutputStream referenceOS = new ObjectOutputStream(
+                  referenceSocket.getOutputStream());
+          referenceOS.writeObject(RegistryServer.LOOKUP);
+          referenceOS.writeObject(objectString);
+          
+          ObjectInputStream referenceIS = new ObjectInputStream(referenceSocket.getInputStream());
+          Reference reference = (Reference) referenceIS.readObject();
+          //System.out.println("==> Got reference for " + method);
+          referenceOS.close();
+          referenceIS.close();
+          referenceSocket.close();
+          return reference;
+      }catch (IOException e)
+      {
+        throw new RemoteException(e.getMessage());
+      }
+      catch (ClassNotFoundException e)
+      {
+          throw new RemoteException(e.getMessage());
+      }
+      
+      
+      }
+    
+    
+    
     @SuppressWarnings("rawtypes")
-    public Object invoke(String objectString, String methodString, List<Class> parameterTypes,
+    public Object invoke(Reference reference, String methodString, List<Class> parameterTypes,
             List<Serializable> parameters) throws RemoteException
     {
         try
         {
-            String method = objectString + "." + methodString + "(...)";
-            
-            // get reference first
-            //System.out.println("<== Getting reference for " + method);
-            Socket referenceSocket = new Socket(serverAddress, serverPort);
-            ObjectOutputStream referenceOS = new ObjectOutputStream(
-                    referenceSocket.getOutputStream());
-            referenceOS.writeObject(RegistryServer.INVOKE);
-            referenceOS.writeObject(objectString);
-            
-            ObjectInputStream referenceIS = new ObjectInputStream(referenceSocket.getInputStream());
-            Reference reference = (Reference) referenceIS.readObject();
-            //System.out.println("==> Got reference for " + method);
-            
-            referenceOS.close();
-            referenceIS.close();
-            referenceSocket.close();
+          
             
             // invoke remotely
             //System.out.println("<== Invoking " + method + " at " + reference);
             Socket invocationSocket = new Socket(reference.getHost(), reference.getPort());
             ObjectOutputStream invocationOS = new ObjectOutputStream(
                     invocationSocket.getOutputStream());
-            invocationOS.writeObject(new Message(objectString, methodString, parameterTypes,
+            invocationOS.writeObject(new Message(reference.getName(), methodString, parameterTypes,
                     parameters));
             
             

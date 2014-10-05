@@ -10,6 +10,11 @@ public class Reference implements Serializable
     private static final long serialVersionUID = 6295695796518967426L;
     
     /**
+     * what the name of the object in registry 
+     */
+    private String name;
+    
+    /**
      * Which machine this object is located on
      */
     private String host;
@@ -19,8 +24,9 @@ public class Reference implements Serializable
      */
     private int port;
     
-    public Reference(String host, int port)
+    public Reference(String name,String host, int port)
     {
+        this.name=name;
         this.host = host;
         this.port = port;
     }
@@ -28,9 +34,12 @@ public class Reference implements Serializable
     @Override
     public String toString()
     {
-        return host + ":" + port;
+        return name+":"+host + ":" + port;
     }
     
+    public String getName(){
+      return name;
+    }
     public String getHost()
     {
         return host;

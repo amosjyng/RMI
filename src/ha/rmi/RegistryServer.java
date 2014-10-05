@@ -15,7 +15,8 @@ import java.util.Map;
 public class RegistryServer
 {
     public static String BIND = "bind";
-    public static String INVOKE = "invoke";
+    public static String LOOKUP = "look up";
+    
     
     /**
      * Which port this RMI server listens for object bindings/method invocations on
@@ -46,13 +47,13 @@ public class RegistryServer
             
             if (command.equals(BIND))
             {
-                String objectString = (String) ois.readObject();
+                //String objectString = (String) ois.readObject();
                 Reference reference = (Reference) ois.readObject();
                 System.out.println("Binding some object from " + reference.getHost() + ":"
-                        + reference.getPort() + " to \"" + objectString + "\"");
-                references.put(objectString, reference);
+                        + reference.getPort() + " to \"" + reference.getName() + "\"");
+                references.put(reference.getName(), reference);
             }
-            else if (command.equals(INVOKE))
+            else if (command.equals(LOOKUP))
             {
                 // send them the reference and have them make the connection themselves
                 
