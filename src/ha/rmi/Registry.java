@@ -192,8 +192,6 @@ public class Registry extends Thread
     {
         try
         {
-          
-            
             // invoke remotely
             //System.out.println("<== Invoking " + method + " at " + reference);
             Socket invocationSocket = new Socket(reference.getHost(), reference.getPort());
@@ -214,12 +212,9 @@ public class Registry extends Thread
             
             return result;
         }
-        catch (IOException e)
+        catch (IOException | ClassNotFoundException e)
         {
-            throw new RemoteException(e.getMessage());
-        }
-        catch (ClassNotFoundException e)
-        {
+            e.printStackTrace();
             throw new RemoteException(e.getMessage());
         }
     }

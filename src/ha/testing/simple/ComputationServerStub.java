@@ -11,6 +11,8 @@ import ha.rmi.Stub;
 
 public class ComputationServerStub extends Stub implements ComputationServer
 {
+    private static final long serialVersionUID = 5638678938318200527L;
+
     public ComputationServerStub(Reference r)
     {
         super(r);

@@ -10,6 +10,7 @@ import ha.rmi.Stub;
 
 public class ZipCodeServerStub extends Stub implements ZipCodeServer
 {
+    private static final long serialVersionUID = 6903716231910131113L;
     String objectString;
     
     public ZipCodeServerStub(Reference r)
