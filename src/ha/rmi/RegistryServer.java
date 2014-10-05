@@ -16,6 +16,7 @@ public class RegistryServer
 {
     public static String BIND = "bind";
     public static String LOOKUP = "look up";
+    public static String LIST ="list";
     
     
     /**
@@ -59,6 +60,12 @@ public class RegistryServer
                 
                 String objectString = (String) ois.readObject();
                 oos.writeObject(references.get(objectString));
+            }
+            else if (command.equals(LIST))
+            {
+                // send them the list of reference and have them make the connection themselves
+                
+                oos.writeObject(references);
             }
             else
             {

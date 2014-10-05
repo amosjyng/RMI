@@ -109,7 +109,7 @@ public class Registry extends Thread
         try
         {
             
-            return stubClass.getConstructor(Reference.class).newInstance(getReference(objectString));
+            return stubClass.getConstructor(Reference.class).newInstance(lookup(objectString));
         }
         catch (InvocationTargetException e)
         {
@@ -124,8 +124,39 @@ public class Registry extends Thread
                     + "\" from RMI server!");
         }
     }
+    public HashMap<String,Reference> list() throws RemoteException{
+      try{ 
+        Socket referencemapSocket = new Socket(serverAddress, serverPort);
+        ObjectOutputStream referencemapOS = new ObjectOutputStream(
+                referencemapSocket.getOutputStream());
+        referencemapOS.writeObject(RegistryServer.LIST);
+        
+        
+        ObjectInputStream referencemapIS = new ObjectInputStream(referencemapSocket.getInputStream());
+        HashMap<String,Reference> l=(HashMap<String,Reference>) referencemapIS.readObject();
+        
+        //System.out.println("==> Got reference for " + method);
+        referencemapOS.close();
+        referencemapIS.close();
+        referencemapSocket.close();
+        return l;
+        
+      }catch (IOException e)
+      {
+        throw new RemoteException(e.getMessage());
+      }
+      catch (ClassNotFoundException e)
+      {
+          throw new RemoteException(e.getMessage());
+      }
+     
+      
+      
+      
+      
+    }
     
-    public Reference getReference(String objectString) throws RemoteException{
+    public Reference lookup(String objectString) throws RemoteException{
       try
       {
           Socket referenceSocket = new Socket(serverAddress, serverPort);
