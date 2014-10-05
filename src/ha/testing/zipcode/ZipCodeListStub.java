@@ -11,25 +11,25 @@ public class ZipCodeListStub extends Stub implements ZipCodeList
 {
     private static final long serialVersionUID = 2322491834267192060L;
     
-    public ZipCodeListStub(Reference r) {
-      super(r);
-      // TODO Auto-generated constructor stub
+    public ZipCodeListStub(Reference r)
+    {
+        super(r);
     }
     
     @SuppressWarnings("rawtypes")
     @Override
     public String getCity() throws RemoteException
     {
-        return (String) ha.rmi.Registry.getClient().invoke(r, "getCity",
-                new ArrayList<Class>(), new ArrayList<Serializable>());
+        return (String) ha.rmi.Registry.getClient().invoke(r, "getCity", new ArrayList<Class>(),
+                new ArrayList<Serializable>());
     }
     
     @SuppressWarnings("rawtypes")
     @Override
     public String getZipCode() throws RemoteException
     {
-        return (String) ha.rmi.Registry.getClient().invoke(r, "getZipCode",
-                new ArrayList<Class>(), new ArrayList<Serializable>());
+        return (String) ha.rmi.Registry.getClient().invoke(r, "getZipCode", new ArrayList<Class>(),
+                new ArrayList<Serializable>());
     }
     
     @SuppressWarnings("rawtypes")

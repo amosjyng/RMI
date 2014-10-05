@@ -94,7 +94,5 @@ public class ZipCodeClient
         System.out.println("\n We test the remote site printing.");
         // here is a test.
         zcs.printAll();
-        
-        //in.close();
     }
 }

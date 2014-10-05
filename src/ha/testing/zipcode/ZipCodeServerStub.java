@@ -14,8 +14,7 @@ public class ZipCodeServerStub extends Stub implements ZipCodeServer
     
     public ZipCodeServerStub(Reference r)
     {
-      super(r);
-      // TODO Auto-generated constructor stub
+        super(r);
     }
     
     @SuppressWarnings("rawtypes")
@@ -46,8 +45,8 @@ public class ZipCodeServerStub extends Stub implements ZipCodeServer
     @Override
     public void printAll() throws RemoteException
     {
-        ha.rmi.Registry.getClient().invoke(r, "printAll",
-                new ArrayList<Class>(), new ArrayList<Serializable>());
+        ha.rmi.Registry.getClient().invoke(r, "printAll", new ArrayList<Class>(),
+                new ArrayList<Serializable>());
     }
     
 }
