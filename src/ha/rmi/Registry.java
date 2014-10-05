@@ -1,7 +1,5 @@
 package ha.rmi;
 
-import ha.rmi.RegistryServer.Reference;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -100,7 +98,7 @@ public class Registry extends Thread
         ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
         oos.writeObject(RegistryServer.BIND);
         oos.writeObject(objectString);
-        oos.writeObject(new RegistryServer.Reference(clientAddress, clientInvocationsPort));
+        oos.writeObject(new Reference(clientAddress, clientInvocationsPort));
         oos.close();
         s.close();
     }

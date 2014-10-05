@@ -3,7 +3,6 @@ package ha.rmi;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
@@ -27,46 +26,6 @@ public class RegistryServer
      * Mapping of strings to the objects the strings refer to
      */
     private Map<String, Reference> references = new HashMap<String, Reference>();
-    
-    public static class Reference implements Serializable
-    {
-        /**
-         * Generated UID for Java serialization
-         */
-        private static final long serialVersionUID = 6295695796518967426L;
-        
-        /**
-         * Which machine this object is located on
-         */
-        private String host;
-        
-        /**
-         * Which port that machine is listening on for method invocation requests
-         */
-        private int port;
-        
-        public Reference(String host, int port)
-        {
-            this.host = host;
-            this.port = port;
-        }
-        
-        @Override
-        public String toString()
-        {
-            return host + ":" + port;
-        }
-        
-        public String getHost()
-        {
-            return host;
-        }
-        
-        public int getPort()
-        {
-            return port;
-        }
-    }
     
     public RegistryServer(int commandPort) throws IOException
     {

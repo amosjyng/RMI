@@ -34,7 +34,7 @@ public class ComputationServerImpl implements ComputationServer
                     Integer.parseInt(args[1]), args[2], Integer.parseInt(args[3]));
             
             ComputationServer ss = new ComputationServerImpl();
-            id = args[5];
+            id = args[4];
             registry.bind("simple server " + id, ss);
             while (true)
                 ; // just chill
