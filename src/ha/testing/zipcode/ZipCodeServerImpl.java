@@ -17,9 +17,9 @@ public class ZipCodeServerImpl implements ZipCodeServer
     // when this is called, marshalled data
     // should be sent to this remote object,
     // and reconstructed.
-    public void initialise(String newlistName) throws RemoteException
+    public void initialise(ZipCodeList newlist) throws RemoteException
     {
-        l = (ZipCodeList) ha.rmi.Registry.getClient().get(newlistName, ZipCodeListStub.class);
+        l = newlist;
     }
     
     // basic function: gets a city name, returns the zip code.
