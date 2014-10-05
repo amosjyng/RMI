@@ -17,26 +17,27 @@ public class ComputationServerImpl implements ComputationServer
     @Override
     public String sayHiTo(String name) throws RemoteException
     {
-        return "Hi, " + name  + "!";
+        return "Hi, " + name + "!";
     }
     
     public static void main(String[] args) throws IOException, NumberFormatException
     {
-        if (args.length != 6)
+        if (args.length != 5)
         {
-            System.out.println("USAGE: java ha.testing.simple.SimpleServerImpl <server address> <server command port> "
-                               + "<server results port> <client address> <client port> <ID number>");
+            System.out
+                    .println("USAGE: java ha.testing.simple.SimpleServerImpl <server address> <server port> "
+                            + "<client address> <client port> <ID number>");
         }
         else
         {
-            ha.rmi.Registry registry =
-                    ha.rmi.Registry.getRegistry(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]),
-                                            args[3], Integer.parseInt(args[4]));
+            ha.rmi.Registry registry = ha.rmi.Registry.getRegistry(args[0],
+                    Integer.parseInt(args[1]), args[2], Integer.parseInt(args[3]));
             
             ComputationServer ss = new ComputationServerImpl();
             id = args[5];
             registry.bind("simple server " + id, ss);
-            registry.listenForMethodInvocations();
+            while (true)
+                ; // just chill
         }
     }
 }

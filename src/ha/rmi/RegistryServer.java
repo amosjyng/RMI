@@ -21,12 +21,7 @@ public class RegistryServer
     /**
      * Which port this RMI server listens for object bindings/method invocations on
      */
-    private ServerSocket commandSocket;
-    
-    /**
-     * Which port this RMI server listens for results of method invocations on
-     */
-    private ServerSocket resultsSocket;
+    private ServerSocket serverSocket;
     
     /**
      * Mapping of strings to the objects the strings refer to
@@ -39,7 +34,7 @@ public class RegistryServer
          * Generated UID for Java serialization
          */
         private static final long serialVersionUID = 6295695796518967426L;
-
+        
         /**
          * Which machine this object is located on
          */
@@ -56,6 +51,12 @@ public class RegistryServer
             this.port = port;
         }
         
+        @Override
+        public String toString()
+        {
+            return host + ":" + port;
+        }
+        
         public String getHost()
         {
             return host;
@@ -67,10 +68,9 @@ public class RegistryServer
         }
     }
     
-    public RegistryServer(int commandPort, int resultsPort) throws IOException
+    public RegistryServer(int commandPort) throws IOException
     {
-        commandSocket = new ServerSocket(commandPort);
-        resultsSocket = new ServerSocket(resultsPort);
+        serverSocket = new ServerSocket(commandPort);
     }
     
     /**
@@ -80,50 +80,25 @@ public class RegistryServer
     {
         try
         {
-            System.out.println("Waiting for command...");
-            Socket acceptedSocket = commandSocket.accept();
+            Socket acceptedSocket = serverSocket.accept();
             ObjectInputStream ois = new ObjectInputStream(acceptedSocket.getInputStream());
+            ObjectOutputStream oos = new ObjectOutputStream(acceptedSocket.getOutputStream());
             String command = (String) ois.readObject();
             
-            System.out.println("Command \"" + command + "\" received.");
             if (command.equals(BIND))
             {
                 String objectString = (String) ois.readObject();
                 Reference reference = (Reference) ois.readObject();
-                System.out.println("Binding some object from " + reference.getHost() + ":" + reference.getPort() + " to \"" + objectString + "\"");
+                System.out.println("Binding some object from " + reference.getHost() + ":"
+                        + reference.getPort() + " to \"" + objectString + "\"");
                 references.put(objectString, reference);
             }
             else if (command.equals(INVOKE))
             {
-                // first send the other machine the method invocation request
-                Message invocationRequest = (Message) ois.readObject();
-                if (!references.containsKey(invocationRequest.getObjectString()))
-                {
-                    throw new Exception("Object \"" + invocationRequest.getObjectString() + "\" not registered yet!");
-                }
-                Reference reference = references.get(invocationRequest.getObjectString());
-                System.out.println("Asking " + reference.getHost() + ":" + reference.getPort() + " to do computation...");
-                Socket objectHostSocket = new Socket(reference.getHost(), reference.getPort());
-                ObjectOutputStream oos = new ObjectOutputStream(objectHostSocket.getOutputStream());
-                oos.writeObject(invocationRequest);
-                oos.close();
-                objectHostSocket.close();
+                // send them the reference and have them make the connection themselves
                 
-                // now wait for the other machine to return the results of the method invocation
-                // and pass those results on to the listening machine
-                System.out.println("Waiting for computation results...");
-                Socket rs = resultsSocket.accept();
-                ObjectInputStream resultsStream = new ObjectInputStream(rs.getInputStream());
-                System.out.println("Returning result to " + invocationRequest.getReturnAddress()
-                                   + ":" + invocationRequest.getReturnPort() + "...");
-                Socket returnSocket = new Socket(invocationRequest.getReturnAddress(), invocationRequest.getReturnPort());
-                ObjectOutputStream returnStream = new ObjectOutputStream(returnSocket.getOutputStream());
-                
-                returnStream.writeObject(resultsStream.readObject());
-                
-                returnStream.close();
-                returnSocket.close();
-                resultsStream.close();
+                String objectString = (String) ois.readObject();
+                oos.writeObject(references.get(objectString));
             }
             else
             {
@@ -131,6 +106,7 @@ public class RegistryServer
             }
             
             ois.close();
+            oos.close();
         }
         catch (IOException e)
         {
@@ -150,13 +126,13 @@ public class RegistryServer
     
     public static void main(String[] args) throws NumberFormatException, IOException
     {
-        if (args.length != 2)
+        if (args.length != 1)
         {
-            System.out.println("USAGE: java ha.rmi.RegistryServer <command port> <results port>");
+            System.out.println("USAGE: java ha.rmi.RegistryServer <port>");
         }
         else
         {
-            RegistryServer server = new RegistryServer(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
+            RegistryServer server = new RegistryServer(Integer.parseInt(args[0]));
             
             while (true)
             {

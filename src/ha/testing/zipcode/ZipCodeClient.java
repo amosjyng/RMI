@@ -24,15 +24,14 @@ public class ZipCodeClient
     // (3) a file name as above.
     public static void main(String[] args) throws Exception
     {
-        //System.setSecurityManager(new SecurityManager());
-        
         if (args.length != 5)
         {
-            System.out.println("USAGE: java ha.testing.zipcode.ZipCodeClient <server address> <server command port> "
-                               + "<client address> <client port> <data file>");
+            System.out
+                    .println("USAGE: java ha.testing.zipcode.ZipCodeClient <server address> <server port> "
+                            + "<client address> <client port> <data file>");
             System.exit(0);
         }
-        ha.rmi.Registry registry = ha.rmi.Registry.getRegistry(args[0], Integer.parseInt(args[1]), null,
+        ha.rmi.Registry registry = ha.rmi.Registry.getRegistry(args[0], Integer.parseInt(args[1]),
                 args[2], Integer.parseInt(args[3]));
         ZipCodeServer zcs = (ZipCodeServer) registry.get("zipcode server", ZipCodeServerStub.class);
         
@@ -52,6 +51,7 @@ public class ZipCodeClient
             else
                 l = new ZipCodeListImpl(city.trim(), code.trim(), l);
         }
+        in.close();
         // the final value of l should be the initial head of
         // the list.
         
@@ -66,7 +66,7 @@ public class ZipCodeClient
         }
         
         // test the initialise.
-        zcs.initialise(l);
+        zcs.initialise("l");
         System.out.println("\n Server initalised.");
         
         // test the find.
@@ -95,6 +95,6 @@ public class ZipCodeClient
         // here is a test.
         zcs.printAll();
         
-        in.close();
+        //in.close();
     }
 }

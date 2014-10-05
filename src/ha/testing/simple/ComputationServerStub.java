@@ -18,6 +18,7 @@ public class ComputationServerStub implements ComputationServer
         this.objectString = objectString;
     }
     
+    @SuppressWarnings("rawtypes")
     @Override
     public String getSomething() throws RemoteException
     {

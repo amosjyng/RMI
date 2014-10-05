@@ -1,5 +1,7 @@
 package ha.testing.zipcode;
 
+import ha.rmi.RemoteException;
+
 public class ZipCodeListImpl implements ZipCodeList
 {
     private static final long serialVersionUID = -2300815110310515265L;
@@ -18,19 +20,19 @@ public class ZipCodeListImpl implements ZipCodeList
     }
 
     @Override
-    public String getCity()
+    public String getCity() throws RemoteException
     {
         return city;
     }
 
     @Override
-    public String getZipCode()
+    public String getZipCode() throws RemoteException
     {
         return ZipCode;
     }
 
     @Override
-    public ZipCodeList getNext()
+    public ZipCodeList getNext() throws RemoteException
     {
         return next;
     }

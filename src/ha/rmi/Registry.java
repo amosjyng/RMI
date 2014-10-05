@@ -1,5 +1,7 @@
 package ha.rmi;
 
+import ha.rmi.RegistryServer.Reference;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -20,7 +22,7 @@ import java.util.Map;
  * Anything wishing to connect to the RMI server should extend this base class
  *
  */
-public class Registry
+public class Registry extends Thread
 {
     /**
      * The singleton instance of this client
@@ -43,37 +45,32 @@ public class Registry
     private Integer serverPort;
     
     /**
-     * Port on that machine where the RMI server is listening for method invocation results
-     */
-    private Integer serverResultsPort;
-    
-    /**
      * The address of this machine
      */
     private String clientAddress;
     
     /**
-     * The port on this machine to listen for information from the RMI server
+     * The port on this machine to listen for method invocations
      */
-    private Integer clientPort;
+    private Integer clientInvocationsPort;
     
-    protected Registry(String serverAddress, Integer serverPort, Integer serverResultsPort,
-            String clientAddress, Integer clientPort)
+    protected Registry(String serverAddress, Integer serverPort, String clientAddress,
+            Integer clientInvocationsPort)
     {
         this.serverAddress = serverAddress;
         this.serverPort = serverPort;
-        this.serverResultsPort = serverResultsPort;
         this.clientAddress = clientAddress;
-        this.clientPort = clientPort;
+        this.clientInvocationsPort = clientInvocationsPort;
+        
+        this.start();
     }
     
     public static Registry getRegistry(String serverAddress, Integer serverPort,
-            Integer serverResultsPort, String clientAddress, Integer clientPort)
+            String clientAddress, Integer clientPort)
     {
         if (instance == null)
         {
-            instance = new Registry(serverAddress, serverPort, serverResultsPort, clientAddress,
-                    clientPort);
+            instance = new Registry(serverAddress, serverPort, clientAddress, clientPort);
         }
         
         return instance;
@@ -103,15 +100,13 @@ public class Registry
         ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
         oos.writeObject(RegistryServer.BIND);
         oos.writeObject(objectString);
-        oos.writeObject(new RegistryServer.Reference(clientAddress, clientPort));
+        oos.writeObject(new RegistryServer.Reference(clientAddress, clientInvocationsPort));
         oos.close();
         s.close();
     }
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public Object get(String objectString, Class stubClass) throws InstantiationException,
-            IllegalAccessException, IllegalArgumentException, InvocationTargetException,
-            NoSuchMethodException, SecurityException
+    public Object get(String objectString, Class stubClass) throws RemoteException
     {
         if (localObjects.containsKey(objectString))
         {
@@ -119,32 +114,65 @@ public class Registry
         }
         else
         {
-            return stubClass.getConstructor(String.class).newInstance(objectString);
+            try
+            {
+                return stubClass.getConstructor(String.class).newInstance(objectString);
+            }
+            catch (InvocationTargetException e)
+            {
+                e.getTargetException().printStackTrace();
+                throw new RemoteException(e.getTargetException().getMessage());
+            }
+            catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+                    | NoSuchMethodException | SecurityException e)
+            {
+                throw new RemoteException("Can't retrieve object \"" + objectString
+                        + "\" from RMI server!");
+            }
         }
     }
     
+    @SuppressWarnings("rawtypes")
     public Object invoke(String objectString, String methodString, List<Class> parameterTypes,
             List<Serializable> parameters) throws RemoteException
     {
         try
         {
-            // send invocation request to server
-            Socket s = new Socket(serverAddress, serverPort);
-            ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
-            oos.writeObject(RegistryServer.INVOKE);
-            oos.writeObject(new Message(objectString, methodString, parameterTypes, parameters,
-                    clientAddress, clientPort));
-            oos.close();
-            s.close();
+            String method = objectString + "." + methodString + "(...)";
             
-            // listen for result response from server
-            ServerSocket ss = new ServerSocket(clientPort);
-            Socket rs = ss.accept();
-            ObjectInputStream ois = new ObjectInputStream(rs.getInputStream());
-            Object result = ois.readObject();
-            ois.close();
-            rs.close();
-            ss.close();
+            // get reference first
+            //System.out.println("<== Getting reference for " + method);
+            Socket referenceSocket = new Socket(serverAddress, serverPort);
+            ObjectOutputStream referenceOS = new ObjectOutputStream(
+                    referenceSocket.getOutputStream());
+            referenceOS.writeObject(RegistryServer.INVOKE);
+            referenceOS.writeObject(objectString);
+            
+            ObjectInputStream referenceIS = new ObjectInputStream(referenceSocket.getInputStream());
+            Reference reference = (Reference) referenceIS.readObject();
+            //System.out.println("==> Got reference for " + method);
+            
+            referenceOS.close();
+            referenceIS.close();
+            referenceSocket.close();
+            
+            // invoke remotely
+            //System.out.println("<== Invoking " + method + " at " + reference);
+            Socket invocationSocket = new Socket(reference.getHost(), reference.getPort());
+            ObjectOutputStream invocationOS = new ObjectOutputStream(
+                    invocationSocket.getOutputStream());
+            invocationOS.writeObject(new Message(objectString, methodString, parameterTypes,
+                    parameters));
+            
+            
+            ObjectInputStream invocationIS = new ObjectInputStream(
+                    invocationSocket.getInputStream());
+            Object result = invocationIS.readObject();
+            //System.out.println("==> Got result for " + method + " from " + reference);
+            
+            invocationOS.close();
+            invocationIS.close();
+            invocationSocket.close();
             
             return result;
         }
@@ -163,23 +191,22 @@ public class Registry
      * 
      * @throws IOException
      */
-    public void listenForMethodInvocations() throws IOException
+    private void listenForMethodInvocations() throws IOException, RemoteException
     {
         @SuppressWarnings("resource")
-        ServerSocket ss = new ServerSocket(clientPort);
+        ServerSocket ss = new ServerSocket(clientInvocationsPort);
+        System.out.println("Waiting for method invocations from RMI server on port "
+                + clientInvocationsPort + "...");
         while (true)
         {
             try
             {
                 // read invocation request
-                System.out.println("Waiting for method invocations from RMI server...");
                 Socket s = ss.accept();
                 ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
                 Message invocationRequest = (Message) ois.readObject();
-                ois.close();
-                System.out.println("Invocation request for local object \""
-                        + invocationRequest.getObjectString() + "\"" + " for the method \""
-                        + invocationRequest.getMethod() + "\"");
+                /*System.out.println("==> Remote request for " + invocationRequest.getObjectString()
+                        + "." + invocationRequest.getMethod());*/
                 
                 // execute invocation
                 Object requestedObject = localObjects.get(invocationRequest.getObjectString());
@@ -189,42 +216,43 @@ public class Registry
                         invocationRequest.getParameters());
                 
                 // return result to RMI server
-                Socket rs = new Socket(serverAddress, serverResultsPort);
-                ObjectOutputStream ros = new ObjectOutputStream(rs.getOutputStream());
-                ros.writeObject(result);
-                ros.close();
-                rs.close();
+                ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
+                oos.writeObject(result);
+                /*System.out
+                        .println("<== Returned remote result for "
+                                + invocationRequest.getObjectString() + "."
+                                + invocationRequest.getMethod());*/
+                
+                ois.close();
+                oos.close();
+                s.close();
             }
-            catch (ClassNotFoundException e)
+            catch (ClassNotFoundException | NoSuchMethodException | SecurityException
+                    | IllegalAccessException | IllegalArgumentException e)
             {
                 System.err.println("Couldn't read message invocation request!");
                 e.printStackTrace();
             }
-            catch (NoSuchMethodException e)
-            {
-                System.err.println("Couldn't find relevant method!");
-                e.printStackTrace();
-            }
-            catch (SecurityException e)
-            {
-                System.err.println("No! Bad security!");
-                e.printStackTrace();
-            }
-            catch (IllegalAccessException e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            catch (IllegalArgumentException e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
             catch (InvocationTargetException e)
             {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                System.err.println("Invocation error:");
+                e.getTargetException().printStackTrace();
+                throw new RemoteException(e.getTargetException().getMessage());
             }
+        }
+    }
+    
+    @Override
+    public void run()
+    {
+        try
+        {
+            listenForMethodInvocations();
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 }

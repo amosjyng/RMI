@@ -14,10 +14,10 @@ public class ZipCodeServerStub implements ZipCodeServer
     }
     
     @Override
-    public void initialise(ZipCodeList newlist) throws RemoteException
+    public void initialise(String newlistName) throws RemoteException
     {
         ha.rmi.Registry.getClient().invoke(objectString, "initialise",
-                Arrays.asList(ZipCodeList.class), Arrays.asList(newlist));
+                Arrays.asList(String.class), Arrays.asList(newlistName));
     }
     
     @Override

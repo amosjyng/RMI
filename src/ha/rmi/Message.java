@@ -1,7 +1,6 @@
 package ha.rmi;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,6 +26,7 @@ public class Message implements Serializable
     /**
      * All the types of parameters used in this method invocation
      */
+    @SuppressWarnings("rawtypes")
     private List<Class> parameterTypes;
     
     /**
@@ -34,25 +34,20 @@ public class Message implements Serializable
      */
     private List<Serializable> parameters;
     
-    /**
-     * Which machine requested this method invocation
-     */
-    private String returnAddress;
-    
-    /**
-     * Which port that machine is listening on for method invocation results.
-     */
-    private int returnPort;
-    
+    @SuppressWarnings("rawtypes")
     public Message(String objectString, String method, List<Class> parameterTypes,
-            List<Serializable> parameters, String returnAddress, int returnPort)
+            List<Serializable> parameters)
     {
         this.objectString = objectString;
         this.method = method;
         this.parameterTypes = parameterTypes;
         this.parameters = parameters;
-        this.returnAddress = returnAddress;
-        this.returnPort = returnPort;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return this.objectString + "." + this.method + "(...)";
     }
     
     public String getObjectString()
@@ -74,15 +69,5 @@ public class Message implements Serializable
     public Class[] getParameterTypes()
     {
         return parameterTypes.toArray(new Class[parameterTypes.size()]);
-    }
-    
-    public String getReturnAddress()
-    {
-        return returnAddress;
-    }
-    
-    public int getReturnPort()
-    {
-        return returnPort;
     }
 }

@@ -1,8 +1,5 @@
 package ha.testing.zipcode;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
-
 import ha.rmi.*;
 
 public class ZipCodeServerImpl implements ZipCodeServer
@@ -20,9 +17,9 @@ public class ZipCodeServerImpl implements ZipCodeServer
     // when this is called, marshalled data
     // should be sent to this remote object,
     // and reconstructed.
-    public void initialise(ZipCodeList newlist) throws RemoteException
+    public void initialise(String newlistName) throws RemoteException
     {
-        l = newlist;
+        l = (ZipCodeList) ha.rmi.Registry.getClient().get(newlistName, ZipCodeListStub.class);
     }
     
     // basic function: gets a city name, returns the zip code.
@@ -53,27 +50,29 @@ public class ZipCodeServerImpl implements ZipCodeServer
         ZipCodeList temp = l;
         while (temp != null)
         {
-            System.out.println("city: " + temp.getCity() + ", " + "code: " + temp.getZipCode() + "\n");
+            System.out.println("city: " + temp.getCity() + ", " + "code: " + temp.getZipCode()
+                    + "\n");
             temp = temp.getNext();
         }
     }
     
-    public static void main(String[] args) throws RemoteException, UnknownHostException, IOException
+    public static void main(String[] args) throws Exception
     {
-        if (args.length != 5)
+        if (args.length != 4)
         {
-            System.out.println("USAGE: java ha.testing.zipcode.ZipCodeServerImpl <server address> <server command port> "
-                               + "<server results port> <client address> <client port>");
+            System.out
+                    .println("USAGE: java ha.testing.zipcode.ZipCodeServerImpl <server address> <server port> "
+                            + "<client address> <client port>");
         }
         else
         {
-            ha.rmi.Registry registry =
-                    ha.rmi.Registry.getRegistry(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]),
-                                            args[3], Integer.parseInt(args[4]));
+            ha.rmi.Registry registry = ha.rmi.Registry.getRegistry(args[0],
+                    Integer.parseInt(args[1]), args[2], Integer.parseInt(args[3]));
             
             ZipCodeServer zcs = new ZipCodeServerImpl();
             registry.bind("zipcode server", zcs);
-            registry.listenForMethodInvocations();
+            while (true)
+                ; // just chill
         }
     }
 }

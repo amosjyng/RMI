@@ -4,7 +4,7 @@ import ha.rmi.*;
 
 public interface ZipCodeServer
 {
-    public void initialise(ZipCodeList newlist) throws RemoteException;
+    public void initialise(String newlistName) throws RemoteException;
     
     public String find(String city) throws RemoteException;
     
