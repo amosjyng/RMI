@@ -29,7 +29,15 @@ public class Registry extends Thread
      */
     private static Registry instance = null;
     
+    /**
+     * Random number generator for binding objects to strings
+     */
     private Random random;
+    
+    /**
+     * Whether to print debugging statements or not
+     */
+    private static boolean DEBUG = false;
     
     /**
      * Mapping of strings to objects contained on this particular machine
@@ -67,6 +75,14 @@ public class Registry extends Thread
         this.random = new Random();
         
         this.start();
+    }
+    
+    private static void debug(String message)
+    {
+        if (DEBUG)
+        {
+            System.err.println(message);
+        }
     }
     
     public static Registry getRegistry(String serverAddress, Integer serverPort,
@@ -211,12 +227,16 @@ public class Registry extends Thread
     private Serializable getObjectOrStub(Class possiblyRemoteInterface, Object parameter)
             throws RemoteException, ClassNotFoundException
     {
-        if (!Stub.class.isAssignableFrom(parameter.getClass())
+        if (possiblyRemoteInterface == null || parameter == null)
+        {
+            return null; // some functions don't return anything
+        }
+        else if (!Stub.class.isAssignableFrom(parameter.getClass())
                 && Remote.class.isAssignableFrom(possiblyRemoteInterface))
         {
             String objectString = new Integer(random.nextInt()).toString();
             localObjects.put(objectString, parameter);
-            System.err.println("Adding stub for " + possiblyRemoteInterface + "Stub");
+            debug("Creating " + possiblyRemoteInterface + "Stub for reference");
             return (Serializable) get(objectString,
                     Class.forName(possiblyRemoteInterface.getName() + "Stub"));
         }
@@ -240,17 +260,19 @@ public class Registry extends Thread
             }
             
             // invoke remotely
-            // System.out.println("<== Invoking " + method + " at " + reference);
             Socket invocationSocket = new Socket(reference.getHost(), reference.getPort());
             ObjectOutputStream invocationOS = new ObjectOutputStream(
                     invocationSocket.getOutputStream());
             invocationOS.writeObject(new Message(reference.getName(), methodString, parameterTypes,
                     referenceParameters));
+            debug("<== Invoking " + reference.getName() + "." + methodString + "(...) at "
+                    + reference);
             
             ObjectInputStream invocationIS = new ObjectInputStream(
                     invocationSocket.getInputStream());
             Object result = invocationIS.readObject();
-            // System.out.println("==> Got result for " + method + " from " + reference);
+            debug("==> Got result for " + reference.getName() + ":" + methodString + "(...) from "
+                    + reference);
             
             invocationOS.close();
             invocationIS.close();
@@ -284,8 +306,8 @@ public class Registry extends Thread
                 Socket s = ss.accept();
                 ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
                 Message invocationRequest = (Message) ois.readObject();
-                System.err.println("==> Remote request for " + invocationRequest.getObjectString()
-                        + "." + invocationRequest.getMethod());
+                debug("==> Remote request for " + invocationRequest.getObjectString() + "."
+                        + invocationRequest.getMethod());
                 
                 // execute invocation
                 Object requestedObject = localObjects.get(invocationRequest.getObjectString());
@@ -297,10 +319,9 @@ public class Registry extends Thread
                 // return result to RMI server
                 ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
                 oos.writeObject(getObjectOrStub(requestedMethod.getReturnType(), result));
-                /*
-                 * System.out .println("<== Returned remote result for " +
-                 * invocationRequest.getObjectString() + "." + invocationRequest.getMethod());
-                 */
+                
+                debug("<== Returned remote result for " + invocationRequest.getObjectString() + "."
+                        + invocationRequest.getMethod());
                 
                 ois.close();
                 oos.close();

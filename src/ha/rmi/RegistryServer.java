@@ -58,6 +58,7 @@ public class RegistryServer
                 // send them the reference and have them make the connection themselves
                 
                 String objectString = (String) ois.readObject();
+                System.out.println("Reference for \"" + objectString + "\" requested");
                 oos.writeObject(references.get(objectString));
             }
             else if (command.equals(LIST))
