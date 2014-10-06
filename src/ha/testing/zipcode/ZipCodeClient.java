@@ -66,7 +66,7 @@ public class ZipCodeClient
         }
         
         // test the initialise.
-        zcs.initialise((ZipCodeList) ha.rmi.Registry.getClient().get("l", ZipCodeListStub.class));
+        zcs.initialise(l);
         System.out.println("\n Server initalised.");
         
         // test the find.

@@ -166,7 +166,6 @@ public class Registry extends Thread
             @SuppressWarnings("unchecked")
             HashMap<String, Reference> l = (HashMap<String, Reference>) referencemapIS.readObject();
             
-            // System.out.println("==> Got reference for " + method);
             referencemapOS.close();
             referencemapIS.close();
             referencemapSocket.close();
@@ -248,7 +247,7 @@ public class Registry extends Thread
     
     @SuppressWarnings("rawtypes")
     public Object invoke(Reference reference, String methodString, List<Class> parameterTypes,
-            List<Serializable> parameters) throws RemoteException
+            List<Object> parameters) throws RemoteException
     {
         try
         {

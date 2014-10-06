@@ -21,7 +21,7 @@ public class ZipCodeListStub extends Stub implements ZipCodeList
     public String getCity() throws RemoteException
     {
         return (String) ha.rmi.Registry.getClient().invoke(r, "getCity", new ArrayList<Class>(),
-                new ArrayList<Serializable>());
+                new ArrayList<Object>());
     }
     
     @SuppressWarnings("rawtypes")
@@ -29,7 +29,7 @@ public class ZipCodeListStub extends Stub implements ZipCodeList
     public String getZipCode() throws RemoteException
     {
         return (String) ha.rmi.Registry.getClient().invoke(r, "getZipCode", new ArrayList<Class>(),
-                new ArrayList<Serializable>());
+                new ArrayList<Object>());
     }
     
     @SuppressWarnings("rawtypes")
@@ -37,7 +37,7 @@ public class ZipCodeListStub extends Stub implements ZipCodeList
     public ZipCodeList getNext() throws RemoteException
     {
         return (ZipCodeList) ha.rmi.Registry.getClient().invoke(r, "getNext",
-                new ArrayList<Class>(), new ArrayList<Serializable>());
+                new ArrayList<Class>(), new ArrayList<Object>());
     }
     
 }

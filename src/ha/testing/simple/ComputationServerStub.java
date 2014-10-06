@@ -23,7 +23,7 @@ public class ComputationServerStub extends Stub implements ComputationServer
     public String getSomething() throws RemoteException
     {
         return (String) ha.rmi.Registry.getClient().invoke(r, "getSomething",
-                new ArrayList<Class>(), new ArrayList<Serializable>());
+                new ArrayList<Class>(), new ArrayList<Object>());
     }
     
     @SuppressWarnings("rawtypes")
@@ -31,6 +31,6 @@ public class ComputationServerStub extends Stub implements ComputationServer
     public String sayHiTo(String name) throws RemoteException
     {
         return (String) ha.rmi.Registry.getClient().invoke(r, "sayHiTo",
-                Arrays.asList((Class) String.class), Arrays.asList((Serializable) name));
+                Arrays.asList((Class) String.class), Arrays.asList(name));
     }
 }
