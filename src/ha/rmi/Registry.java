@@ -37,7 +37,7 @@ public class Registry extends Thread
     /**
      * Whether to print debugging statements or not
      */
-    private static boolean DEBUG = true;
+    private static boolean DEBUG = false;
     
     /**
      * Mapping of strings to objects contained on this particular machine
