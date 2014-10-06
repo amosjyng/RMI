@@ -2,7 +2,7 @@ package ha.testing.zipcode;
 
 import ha.rmi.*;
 
-public interface ZipCodeServer
+public interface ZipCodeServer extends Remote
 {
     public void initialise(ZipCodeList newlist) throws RemoteException;
     

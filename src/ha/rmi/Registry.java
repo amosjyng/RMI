@@ -9,9 +9,11 @@ import java.lang.reflect.Method;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * This is the RMI client that connects to the RMI server to perform object bindings/method
@@ -26,6 +28,8 @@ public class Registry extends Thread
      * The singleton instance of this client
      */
     private static Registry instance = null;
+    
+    private Random random;
     
     /**
      * Mapping of strings to objects contained on this particular machine
@@ -59,6 +63,8 @@ public class Registry extends Thread
         this.serverPort = serverPort;
         this.clientAddress = clientAddress;
         this.clientInvocationsPort = clientInvocationsPort;
+        
+        this.random = new Random();
         
         this.start();
     }
@@ -108,7 +114,11 @@ public class Registry extends Thread
     {
         try
         {
-            
+          if(locallookup(objectString)){
+            Reference r=new Reference(objectString,clientAddress,clientInvocationsPort );
+            return stubClass.getConstructor(Reference.class).newInstance(r);
+          }
+          else
             return stubClass.getConstructor(Reference.class).newInstance(lookup(objectString));
         }
         catch (InvocationTargetException e)
@@ -156,6 +166,13 @@ public class Registry extends Thread
       
     }
     
+    public boolean locallookup(String objectString){
+      if (localObjects.get(objectString)!=null){
+        return true;
+      }
+      else
+        return false;
+      }
     public Reference lookup(String objectString) throws RemoteException{
       try
       {
@@ -184,7 +201,19 @@ public class Registry extends Thread
       
       }
     
-    
+    private Serializable getObjectOrStub(Class possiblyRemoteInterface, Object parameter) throws RemoteException, ClassNotFoundException
+    {
+        if (!Stub.class.isAssignableFrom(parameter.getClass()) && Remote.class.isAssignableFrom(possiblyRemoteInterface)){
+          String objectString = new Integer(random.nextInt()).toString();
+          localObjects.put(objectString, parameter);
+          System.err.println("Adding stub for " + possiblyRemoteInterface + "Stub");
+          return (Serializable) get(objectString, Class.forName(possiblyRemoteInterface.getName() + "Stub"));
+        }
+        else
+        {
+          return (Serializable) parameter;
+        }
+    }
     
     @SuppressWarnings("rawtypes")
     public Object invoke(Reference reference, String methodString, List<Class> parameterTypes,
@@ -192,13 +221,19 @@ public class Registry extends Thread
     {
         try
         {
+            // marshall parameters
+            List<Serializable> referenceParameters = new ArrayList<Serializable>();
+            for(int i=0;i<parameters.size();i++){
+                referenceParameters.add(getObjectOrStub(parameterTypes.get(i), parameters.get(i)));
+            }
+          
             // invoke remotely
             //System.out.println("<== Invoking " + method + " at " + reference);
             Socket invocationSocket = new Socket(reference.getHost(), reference.getPort());
             ObjectOutputStream invocationOS = new ObjectOutputStream(
                     invocationSocket.getOutputStream());
             invocationOS.writeObject(new Message(reference.getName(), methodString, parameterTypes,
-                    parameters));
+                    referenceParameters));
             
             
             ObjectInputStream invocationIS = new ObjectInputStream(
@@ -238,8 +273,8 @@ public class Registry extends Thread
                 Socket s = ss.accept();
                 ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
                 Message invocationRequest = (Message) ois.readObject();
-                /*System.out.println("==> Remote request for " + invocationRequest.getObjectString()
-                        + "." + invocationRequest.getMethod());*/
+                System.err.println("==> Remote request for " + invocationRequest.getObjectString()
+                        + "." + invocationRequest.getMethod());
                 
                 // execute invocation
                 Object requestedObject = localObjects.get(invocationRequest.getObjectString());
@@ -250,7 +285,7 @@ public class Registry extends Thread
                 
                 // return result to RMI server
                 ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
-                oos.writeObject(result);
+                oos.writeObject(getObjectOrStub(requestedMethod.getReturnType(), result));
                 /*System.out
                         .println("<== Returned remote result for "
                                 + invocationRequest.getObjectString() + "."
