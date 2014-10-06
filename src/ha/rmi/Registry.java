@@ -103,8 +103,8 @@ public class Registry extends Thread
         Socket s = new Socket(serverAddress, serverPort);
         ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
         oos.writeObject(RegistryServer.BIND);
-       
-        oos.writeObject(new Reference(objectString,clientAddress, clientInvocationsPort));
+        
+        oos.writeObject(new Reference(objectString, clientAddress, clientInvocationsPort));
         oos.close();
         s.close();
     }
@@ -114,12 +114,13 @@ public class Registry extends Thread
     {
         try
         {
-          if(locallookup(objectString)){
-            Reference r=new Reference(objectString,clientAddress,clientInvocationsPort );
-            return stubClass.getConstructor(Reference.class).newInstance(r);
-          }
-          else
-            return stubClass.getConstructor(Reference.class).newInstance(lookup(objectString));
+            if (locallookup(objectString))
+            {
+                Reference r = new Reference(objectString, clientAddress, clientInvocationsPort);
+                return stubClass.getConstructor(Reference.class).newInstance(r);
+            }
+            else
+                return stubClass.getConstructor(Reference.class).newInstance(lookup(objectString));
         }
         catch (InvocationTargetException e)
         {
@@ -134,84 +135,94 @@ public class Registry extends Thread
                     + "\" from RMI server!");
         }
     }
-    public HashMap<String,Reference> list() throws RemoteException{
-      try{ 
-        Socket referencemapSocket = new Socket(serverAddress, serverPort);
-        ObjectOutputStream referencemapOS = new ObjectOutputStream(
-                referencemapSocket.getOutputStream());
-        referencemapOS.writeObject(RegistryServer.LIST);
+    
+    public HashMap<String, Reference> list() throws RemoteException
+    {
+        try
+        {
+            Socket referencemapSocket = new Socket(serverAddress, serverPort);
+            ObjectOutputStream referencemapOS = new ObjectOutputStream(
+                    referencemapSocket.getOutputStream());
+            referencemapOS.writeObject(RegistryServer.LIST);
+            
+            ObjectInputStream referencemapIS = new ObjectInputStream(
+                    referencemapSocket.getInputStream());
+            @SuppressWarnings("unchecked")
+            HashMap<String, Reference> l = (HashMap<String, Reference>) referencemapIS.readObject();
+            
+            // System.out.println("==> Got reference for " + method);
+            referencemapOS.close();
+            referencemapIS.close();
+            referencemapSocket.close();
+            return l;
+            
+        }
+        catch (IOException e)
+        {
+            throw new RemoteException(e.getMessage());
+        }
+        catch (ClassNotFoundException e)
+        {
+            throw new RemoteException(e.getMessage());
+        }
         
-        
-        ObjectInputStream referencemapIS = new ObjectInputStream(referencemapSocket.getInputStream());
-        HashMap<String,Reference> l=(HashMap<String,Reference>) referencemapIS.readObject();
-        
-        //System.out.println("==> Got reference for " + method);
-        referencemapOS.close();
-        referencemapIS.close();
-        referencemapSocket.close();
-        return l;
-        
-      }catch (IOException e)
-      {
-        throw new RemoteException(e.getMessage());
-      }
-      catch (ClassNotFoundException e)
-      {
-          throw new RemoteException(e.getMessage());
-      }
-     
-      
-      
-      
-      
     }
     
-    public boolean locallookup(String objectString){
-      if (localObjects.get(objectString)!=null){
-        return true;
-      }
-      else
-        return false;
-      }
-    public Reference lookup(String objectString) throws RemoteException{
-      try
-      {
-          Socket referenceSocket = new Socket(serverAddress, serverPort);
-          ObjectOutputStream referenceOS = new ObjectOutputStream(
-                  referenceSocket.getOutputStream());
-          referenceOS.writeObject(RegistryServer.LOOKUP);
-          referenceOS.writeObject(objectString);
-          
-          ObjectInputStream referenceIS = new ObjectInputStream(referenceSocket.getInputStream());
-          Reference reference = (Reference) referenceIS.readObject();
-          //System.out.println("==> Got reference for " + method);
-          referenceOS.close();
-          referenceIS.close();
-          referenceSocket.close();
-          return reference;
-      }catch (IOException e)
-      {
-        throw new RemoteException(e.getMessage());
-      }
-      catch (ClassNotFoundException e)
-      {
-          throw new RemoteException(e.getMessage());
-      }
-      
-      
-      }
-    
-    private Serializable getObjectOrStub(Class possiblyRemoteInterface, Object parameter) throws RemoteException, ClassNotFoundException
+    public boolean locallookup(String objectString)
     {
-        if (!Stub.class.isAssignableFrom(parameter.getClass()) && Remote.class.isAssignableFrom(possiblyRemoteInterface)){
-          String objectString = new Integer(random.nextInt()).toString();
-          localObjects.put(objectString, parameter);
-          System.err.println("Adding stub for " + possiblyRemoteInterface + "Stub");
-          return (Serializable) get(objectString, Class.forName(possiblyRemoteInterface.getName() + "Stub"));
+        if (localObjects.get(objectString) != null)
+        {
+            return true;
+        }
+        else
+            return false;
+    }
+    
+    public Reference lookup(String objectString) throws RemoteException
+    {
+        try
+        {
+            Socket referenceSocket = new Socket(serverAddress, serverPort);
+            ObjectOutputStream referenceOS = new ObjectOutputStream(
+                    referenceSocket.getOutputStream());
+            referenceOS.writeObject(RegistryServer.LOOKUP);
+            referenceOS.writeObject(objectString);
+            
+            ObjectInputStream referenceIS = new ObjectInputStream(referenceSocket.getInputStream());
+            Reference reference = (Reference) referenceIS.readObject();
+            // System.out.println("==> Got reference for " + method);
+            referenceOS.close();
+            referenceIS.close();
+            referenceSocket.close();
+            return reference;
+        }
+        catch (IOException e)
+        {
+            throw new RemoteException(e.getMessage());
+        }
+        catch (ClassNotFoundException e)
+        {
+            throw new RemoteException(e.getMessage());
+        }
+        
+    }
+    
+    @SuppressWarnings("rawtypes")
+    private Serializable getObjectOrStub(Class possiblyRemoteInterface, Object parameter)
+            throws RemoteException, ClassNotFoundException
+    {
+        if (!Stub.class.isAssignableFrom(parameter.getClass())
+                && Remote.class.isAssignableFrom(possiblyRemoteInterface))
+        {
+            String objectString = new Integer(random.nextInt()).toString();
+            localObjects.put(objectString, parameter);
+            System.err.println("Adding stub for " + possiblyRemoteInterface + "Stub");
+            return (Serializable) get(objectString,
+                    Class.forName(possiblyRemoteInterface.getName() + "Stub"));
         }
         else
         {
-          return (Serializable) parameter;
+            return (Serializable) parameter;
         }
     }
     
@@ -223,23 +234,23 @@ public class Registry extends Thread
         {
             // marshall parameters
             List<Serializable> referenceParameters = new ArrayList<Serializable>();
-            for(int i=0;i<parameters.size();i++){
+            for (int i = 0; i < parameters.size(); i++)
+            {
                 referenceParameters.add(getObjectOrStub(parameterTypes.get(i), parameters.get(i)));
             }
-          
+            
             // invoke remotely
-            //System.out.println("<== Invoking " + method + " at " + reference);
+            // System.out.println("<== Invoking " + method + " at " + reference);
             Socket invocationSocket = new Socket(reference.getHost(), reference.getPort());
             ObjectOutputStream invocationOS = new ObjectOutputStream(
                     invocationSocket.getOutputStream());
             invocationOS.writeObject(new Message(reference.getName(), methodString, parameterTypes,
                     referenceParameters));
             
-            
             ObjectInputStream invocationIS = new ObjectInputStream(
                     invocationSocket.getInputStream());
             Object result = invocationIS.readObject();
-            //System.out.println("==> Got result for " + method + " from " + reference);
+            // System.out.println("==> Got result for " + method + " from " + reference);
             
             invocationOS.close();
             invocationIS.close();
@@ -286,10 +297,10 @@ public class Registry extends Thread
                 // return result to RMI server
                 ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
                 oos.writeObject(getObjectOrStub(requestedMethod.getReturnType(), result));
-                /*System.out
-                        .println("<== Returned remote result for "
-                                + invocationRequest.getObjectString() + "."
-                                + invocationRequest.getMethod());*/
+                /*
+                 * System.out .println("<== Returned remote result for " +
+                 * invocationRequest.getObjectString() + "." + invocationRequest.getMethod());
+                 */
                 
                 ois.close();
                 oos.close();

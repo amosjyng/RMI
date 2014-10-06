@@ -16,8 +16,7 @@ public class RegistryServer
 {
     public static String BIND = "bind";
     public static String LOOKUP = "look up";
-    public static String LIST ="list";
-    
+    public static String LIST = "list";
     
     /**
      * Which port this RMI server listens for object bindings/method invocations on
@@ -48,7 +47,7 @@ public class RegistryServer
             
             if (command.equals(BIND))
             {
-                //String objectString = (String) ois.readObject();
+                // String objectString = (String) ois.readObject();
                 Reference reference = (Reference) ois.readObject();
                 System.out.println("Binding some object from " + reference.getHost() + ":"
                         + reference.getPort() + " to \"" + reference.getName() + "\"");

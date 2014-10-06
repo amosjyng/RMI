@@ -18,19 +18,19 @@ public class ZipCodeListImpl implements ZipCodeList
         ZipCode = z;
         next = n;
     }
-
+    
     @Override
     public String getCity() throws RemoteException
     {
         return city;
     }
-
+    
     @Override
     public String getZipCode() throws RemoteException
     {
         return ZipCode;
     }
-
+    
     @Override
     public ZipCodeList getNext() throws RemoteException
     {
