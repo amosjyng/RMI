@@ -1,15 +1,18 @@
 package ha.testing.zipcode;
 
-import ha.rmi.Remote;
-import ha.rmi.RemoteException;
-
 import java.io.Serializable;
 
-public interface ZipCodeList extends Remote
+public class ZipCodeList implements Serializable
 {
-    public String getCity() throws RemoteException;
+    private static final long serialVersionUID = -4670915090781162038L;
+    String city;
+    String ZipCode;
+    ZipCodeList next;
     
-    public String getZipCode() throws RemoteException;
-    
-    public ZipCodeList getNext() throws RemoteException;
+    public ZipCodeList(String c, String z, ZipCodeList n)
+    {
+        city = c;
+        ZipCode = z;
+        next = n;
+    }
 }

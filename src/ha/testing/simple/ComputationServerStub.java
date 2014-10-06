@@ -22,7 +22,7 @@ public class ComputationServerStub extends Stub implements ComputationServer
     @Override
     public String getSomething() throws RemoteException
     {
-        return (String) ha.rmi.Registry.getClient().invoke(r, "getSomething",
+        return (String) ha.rmi.Registry.getRegistry().invoke(r, "getSomething",
                 new ArrayList<Class>(), new ArrayList<Object>());
     }
     
@@ -30,7 +30,7 @@ public class ComputationServerStub extends Stub implements ComputationServer
     @Override
     public String sayHiTo(String name) throws RemoteException
     {
-        return (String) ha.rmi.Registry.getClient().invoke(r, "sayHiTo",
+        return (String) ha.rmi.Registry.getRegistry().invoke(r, "sayHiTo",
                 Arrays.asList((Class) String.class), Arrays.asList(name));
     }
 }

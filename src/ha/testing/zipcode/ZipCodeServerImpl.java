@@ -27,14 +27,14 @@ public class ZipCodeServerImpl implements ZipCodeServer
     {
         // search the list.
         ZipCodeList temp = l;
-        while (temp != null && !temp.getCity().equals(request))
-            temp = temp.getNext();
+        while (temp != null && !temp.city.equals(request))
+            temp = temp.next;
         
         // the result is either null or we found the match.
         if (temp == null)
             return null;
         else
-            return temp.getZipCode();
+            return temp.ZipCode;
     }
     
     // this very short method should send the marshalled
@@ -50,9 +50,9 @@ public class ZipCodeServerImpl implements ZipCodeServer
         ZipCodeList temp = l;
         while (temp != null)
         {
-            System.out.println("city: " + temp.getCity() + ", " + "code: " + temp.getZipCode()
+            System.out.println("city: " + temp.city + ", " + "code: " + temp.ZipCode
                     + "\n");
-            temp = temp.getNext();
+            temp = temp.next;
         }
     }
     

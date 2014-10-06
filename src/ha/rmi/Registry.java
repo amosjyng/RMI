@@ -37,7 +37,7 @@ public class Registry extends Thread
     /**
      * Whether to print debugging statements or not
      */
-    private static boolean DEBUG = false;
+    private static boolean DEBUG = true;
     
     /**
      * Mapping of strings to objects contained on this particular machine
@@ -96,7 +96,7 @@ public class Registry extends Thread
         return instance;
     }
     
-    public static Registry getClient()
+    public static Registry getRegistry()
     {
         return instance;
     }
@@ -235,7 +235,7 @@ public class Registry extends Thread
         {
             String objectString = new Integer(random.nextInt()).toString();
             localObjects.put(objectString, parameter);
-            debug("Creating " + possiblyRemoteInterface + "Stub for reference");
+            debug("Creating " + possiblyRemoteInterface.getName() + "Stub");
             return (Serializable) get(objectString,
                     Class.forName(possiblyRemoteInterface.getName() + "Stub"));
         }

@@ -1,6 +1,5 @@
 package ha.testing.zipcode;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -22,7 +21,7 @@ public class ZipCodeServerStub extends Stub implements ZipCodeServer
     @Override
     public void initialise(ZipCodeList newlist) throws RemoteException
     {
-        ha.rmi.Registry.getClient().invoke(r, "initialise",
+        ha.rmi.Registry.getRegistry().invoke(r, "initialise",
                 Arrays.asList((Class) ZipCodeList.class), Arrays.asList(newlist));
     }
     
@@ -30,7 +29,7 @@ public class ZipCodeServerStub extends Stub implements ZipCodeServer
     @Override
     public String find(String city) throws RemoteException
     {
-        return (String) ha.rmi.Registry.getClient().invoke(r, "find",
+        return (String) ha.rmi.Registry.getRegistry().invoke(r, "find",
                 Arrays.asList((Class) String.class), Arrays.asList(city));
     }
     
@@ -38,7 +37,7 @@ public class ZipCodeServerStub extends Stub implements ZipCodeServer
     @Override
     public ZipCodeList findAll() throws RemoteException
     {
-        return (ZipCodeList) ha.rmi.Registry.getClient().invoke(r, "findAll",
+        return (ZipCodeList) ha.rmi.Registry.getRegistry().invoke(r, "findAll",
                 new ArrayList<Class>(), new ArrayList<Object>());
     }
     
@@ -46,7 +45,7 @@ public class ZipCodeServerStub extends Stub implements ZipCodeServer
     @Override
     public void printAll() throws RemoteException
     {
-        ha.rmi.Registry.getClient().invoke(r, "printAll", new ArrayList<Class>(),
+        ha.rmi.Registry.getRegistry().invoke(r, "printAll", new ArrayList<Class>(),
                 new ArrayList<Object>());
     }
     

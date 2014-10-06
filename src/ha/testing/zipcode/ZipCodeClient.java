@@ -49,7 +49,7 @@ public class ZipCodeClient
             if (city == null)
                 flag = false;
             else
-                l = new ZipCodeListImpl(city.trim(), code.trim(), l);
+                l = new ZipCodeList(city.trim(), code.trim(), l);
         }
         in.close();
         // the final value of l should be the initial head of
@@ -61,8 +61,8 @@ public class ZipCodeClient
         registry.bind("l", l);
         while (temp != null)
         {
-            System.out.println("city: " + temp.getCity() + ", " + "code: " + temp.getZipCode());
-            temp = temp.getNext();
+            System.out.println("city: " + temp.city + ", " + "code: " + temp.ZipCode);
+            temp = temp.next;
         }
         
         // test the initialise.
@@ -75,9 +75,9 @@ public class ZipCodeClient
         while (temp != null)
         {
             // here is a test.
-            String res = zcs.find(temp.getCity());
-            System.out.println("city: " + temp.getCity() + ", " + "code: " + res);
-            temp = temp.getNext();
+            String res = zcs.find(temp.city);
+            System.out.println("city: " + temp.city + ", " + "code: " + res);
+            temp = temp.next;
         }
         
         // test the findall.
@@ -86,8 +86,8 @@ public class ZipCodeClient
         temp = zcs.findAll();
         while (temp != null)
         {
-            System.out.println("city: " + temp.getCity() + ", " + "code: " + temp.getZipCode());
-            temp = temp.getNext();
+            System.out.println("city: " + temp.city + ", " + "code: " + temp.ZipCode);
+            temp = temp.next;
         }
         
         // test the printall.
