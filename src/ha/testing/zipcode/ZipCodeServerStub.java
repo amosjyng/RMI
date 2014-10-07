@@ -22,7 +22,7 @@ public class ZipCodeServerStub extends Stub implements ZipCodeServer
     public void initialise(ZipCodeList newlist) throws RemoteException
     {
         ha.rmi.Registry.getRegistry().invoke(r, "initialise",
-                Arrays.asList((Class) ZipCodeList.class), Arrays.asList(newlist));
+                Arrays.asList((Class) ZipCodeList.class), Arrays.asList((Object) newlist));
     }
     
     @SuppressWarnings("rawtypes")
@@ -30,7 +30,7 @@ public class ZipCodeServerStub extends Stub implements ZipCodeServer
     public String find(String city) throws RemoteException
     {
         return (String) ha.rmi.Registry.getRegistry().invoke(r, "find",
-                Arrays.asList((Class) String.class), Arrays.asList(city));
+                Arrays.asList((Class) String.class), Arrays.asList((Object) city));
     }
     
     @SuppressWarnings("rawtypes")
