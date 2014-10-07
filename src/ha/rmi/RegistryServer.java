@@ -10,7 +10,7 @@ import java.util.Map;
 
 /**
  * This is the RMI server that stores object references, not the server doing actual computations.
- *
+ * remember to run the  RegistryServer in the very beginning
  */
 public class RegistryServer
 {

@@ -26,7 +26,7 @@ public class SimpleClient
             try
             {
                 System.out.println(ss.getSomething());
-                System.out.println(ss.sayHiTo("fucker"));
+                System.out.println(ss.sayHiTo("hahaha"));
             }
             catch (RemoteException e)
             {

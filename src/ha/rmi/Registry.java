@@ -85,6 +85,14 @@ public class Registry extends Thread
         }
     }
     
+    /**
+     * this method actually construct the client registry, client here means all machine except the registry server
+     * @param serverAddress
+     * @param serverPort
+     * @param clientAddress
+     * @param clientPort
+     * @return
+     */
     public static Registry getRegistry(String serverAddress, Integer serverPort,
             String clientAddress, Integer clientPort)
     {
@@ -124,7 +132,13 @@ public class Registry extends Thread
         oos.close();
         s.close();
     }
-    
+    /**
+     * this method helps to create server-stub for client, server now means the machine that have the remote object, client means the machine wants the remote object 
+     * @param objectString
+     * @param stubClass
+     * @return
+     * @throws RemoteException
+     */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public Object get(String objectString, Class stubClass) throws RemoteException
     {
@@ -152,6 +166,11 @@ public class Registry extends Thread
         }
     }
     
+    /**
+     * this method will return the map of reference of all the registered remote objects, key is the name and value is reference 
+     * @return
+     * @throws RemoteException
+     */
     public HashMap<String, Reference> list() throws RemoteException
     {
         try
@@ -182,7 +201,12 @@ public class Registry extends Thread
         }
         
     }
-    
+    /**
+     * local lookup helps to handles the situation when client C wants Server B's remote object and pass another remote object as parameters locally, it can directly  
+     * return C's address and port.
+     * @param objectString
+     * @return
+     */
     public boolean locallookup(String objectString)
     {
         if (localObjects.get(objectString) != null)
@@ -192,7 +216,12 @@ public class Registry extends Thread
         else
             return false;
     }
-    
+    /**
+     * this is remote look up, it will look up the reference for the stub when the stub is created
+     * @param objectString
+     * @return
+     * @throws RemoteException
+     */
     public Reference lookup(String objectString) throws RemoteException
     {
         try
@@ -221,7 +250,14 @@ public class Registry extends Thread
         }
         
     }
-    
+    /**
+     * if an object implements remote interface, return stub for it(which is the reference in this context), otherwise return object itself, 
+     * @param possiblyRemoteInterface
+     * @param parameter
+     * @return
+     * @throws RemoteException
+     * @throws ClassNotFoundException
+     */
     @SuppressWarnings("rawtypes")
     private Serializable getObjectOrStub(Class possiblyRemoteInterface, Object parameter)
             throws RemoteException, ClassNotFoundException
@@ -245,6 +281,16 @@ public class Registry extends Thread
         }
     }
     
+    /**
+     * the invoke function sends a message to the other machine to invoke the remote object located on that machine and returns the result of remote method invocation
+     * to the local stub that ask for it  
+     * @param reference
+     * @param methodString
+     * @param parameterTypes
+     * @param parameters
+     * @return
+     * @throws RemoteException
+     */
     @SuppressWarnings("rawtypes")
     public Object invoke(Reference reference, String methodString, List<Class> parameterTypes,
             List<Object> parameters) throws RemoteException
