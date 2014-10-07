@@ -17,7 +17,7 @@ public class ZipCodeRListStub extends Stub implements ZipCodeRList
     @Override
     public String find(String city) throws RemoteException
     {
-        return (String) Registry.getRegistry().invoke(r, "find", Arrays.asList(String.class),
+        return (String) Registry.getRegistry().invoke(r, "find", Arrays.asList((Class) String.class),
                 Arrays.asList(city));
     }
     
@@ -25,7 +25,7 @@ public class ZipCodeRListStub extends Stub implements ZipCodeRList
     public ZipCodeRList add(String city, String zipcode) throws RemoteException
     {
         return (ZipCodeRList) Registry.getRegistry().invoke(r, "add",
-                Arrays.asList(String.class, String.class), Arrays.asList(city, zipcode));
+                Arrays.asList((Class) String.class, (Class) String.class), Arrays.asList(city, zipcode));
     }
     
     @SuppressWarnings("rawtypes")
