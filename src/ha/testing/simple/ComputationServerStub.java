@@ -31,6 +31,6 @@ public class ComputationServerStub extends Stub implements ComputationServer
     public String sayHiTo(String name) throws RemoteException
     {
         return (String) ha.rmi.Registry.getRegistry().invoke(r, "sayHiTo",
-                Arrays.asList((Class) String.class), Arrays.asList(name));
+                Arrays.asList((Class) String.class), Arrays.asList((Object) name));
     }
 }
